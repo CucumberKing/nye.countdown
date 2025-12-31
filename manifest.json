@@ -1,0 +1,19 @@
+{
+  "name": "NYE 2026 Countdown",
+  "short_name": "NYE 2026",
+  "description": "Countdown to New Year's Eve 2026 with stunning animations!",
+  "start_url": "/",
+  "display": "fullscreen",
+  "background_color": "#0a0a0f",
+  "theme_color": "#0a0a0f",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎉</text></svg>",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
+
