@@ -1,6 +1,6 @@
 services:
   backend:
-    build: ./backend
+    image: gurkenkoenig/nye-countdown-backend:latest
     container_name: nye-backend
     restart: unless-stopped
     environment:
@@ -15,7 +15,7 @@ services:
       start_period: 10s
 
   frontend:
-    build: ./frontend
+    image: gurkenkoenig/nye-countdown-frontend:latest
     container_name: nye-frontend
     restart: unless-stopped
     expose:
