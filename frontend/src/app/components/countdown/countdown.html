@@ -1,0 +1,77 @@
+<div class="background"></div>
+
+<div class="orb"></div>
+<div class="orb"></div>
+<div class="orb"></div>
+
+<div class="grid-overlay"></div>
+
+<div class="stars" #stars_container></div>
+
+<!-- Countdown View -->
+@if (!is_celebrating()) {
+  <div class="container" (click)="on_click($event)">
+    <h1 class="title">COUNTDOWN TO</h1>
+
+    <div
+      class="countdown"
+      [class.final]="is_final_minute()"
+      [class.last-ten]="is_last_ten()"
+    >
+      <div class="time-block">
+        <div class="time-value">{{ days_display() }}</div>
+        <div class="time-label">Days</div>
+      </div>
+      <div class="separator">:</div>
+      <div class="time-block">
+        <div class="time-value">{{ hours_display() }}</div>
+        <div class="time-label">Hours</div>
+      </div>
+      <div class="separator">:</div>
+      <div class="time-block">
+        <div class="time-value">{{ minutes_display() }}</div>
+        <div class="time-label">Minutes</div>
+      </div>
+      <div class="separator">:</div>
+      <div class="time-block">
+        <div class="time-value">{{ seconds_display() }}</div>
+        <div class="time-label">Seconds</div>
+      </div>
+    </div>
+
+    <p class="subtitle">✨ Until 2026 ✨</p>
+
+    <!-- Sync status indicator -->
+    <div class="sync-status" [attr.data-status]="sync_status()">
+      @switch (sync_status()) {
+        @case ('synced') {
+          <span class="sync-icon">⚛️</span> Atomic synced
+        }
+        @case ('connected') {
+          <span class="sync-icon">🔗</span> Connected
+        }
+        @case ('cached') {
+          <span class="sync-icon">💾</span> Cached offset
+        }
+        @default {
+          <span class="sync-icon">📱</span> Device time
+        }
+      }
+    </div>
+  </div>
+
+  <button class="simulate-btn" (click)="simulate_nye()">simulate nye</button>
+}
+
+<!-- Celebration View -->
+@if (is_celebrating()) {
+  <div class="celebration" (click)="on_click($event)">
+    <div class="year-display">2026</div>
+    <div class="happy-new-year">🎉 HAPPY NEW YEAR! 🎉</div>
+  </div>
+}
+
+<div class="confetti-container" #confetti_container></div>
+
+<button class="fullscreen-btn" (click)="toggle_fullscreen()">⛶ FULLSCREEN</button>
+

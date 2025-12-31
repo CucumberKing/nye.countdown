@@ -1,24 +1,34 @@
 nyecountdown.live {
-    root * /usr/share/caddy
-    file_server
+    # API and WebSocket to backend
+    handle /api/* {
+        reverse_proxy backend:8000
+    }
+
+    handle /health {
+        reverse_proxy backend:8000
+    }
+
+    # WebSocket endpoint
+    handle /ws/* {
+        reverse_proxy backend:8000
+    }
+
+    # Everything else to frontend
+    handle {
+        reverse_proxy frontend:80
+    }
+
+    # Compression
     encode gzip
 
+    # Security headers
     header {
-        # Security headers
         X-Content-Type-Options nosniff
         X-Frame-Options DENY
         Referrer-Policy strict-origin-when-cross-origin
-        # Cache static content
-        Cache-Control "public, max-age=3600"
-    }
-
-    # Handle errors gracefully
-    handle_errors {
-        respond "{err.status_code} {err.status_text}"
     }
 }
 
 www.nyecountdown.live {
     redir https://nyecountdown.live{uri} permanent
 }
-

@@ -1,0 +1,15 @@
+services:
+  backend:
+    build: ./backend
+    container_name: nye-backend-dev
+    ports:
+      - "8000:8000"
+    environment:
+      - NYE_ENVIRONMENT=development
+    volumes:
+      - ./backend/app:/app/app:ro
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # Frontend runs separately with ng serve for hot reload
+  # Run: cd frontend && npm start
+

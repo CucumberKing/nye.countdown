@@ -1,16 +1,43 @@
 services:
-  nye-countdown:
-    build: .
-    container_name: nye-countdown
+  backend:
+    build: ./backend
+    container_name: nye-backend
+    restart: unless-stopped
+    environment:
+      - NYE_ENVIRONMENT=production
+    expose:
+      - "8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  frontend:
+    build: ./frontend
+    container_name: nye-frontend
+    restart: unless-stopped
+    expose:
+      - "80"
+    depends_on:
+      - backend
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: nye-caddy
     restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
     volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
+    depends_on:
+      - frontend
+      - backend
 
 volumes:
   caddy_data:
   caddy_config:
-
