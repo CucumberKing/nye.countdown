@@ -81,21 +81,20 @@ logs:
 docker_user := env_var_or_default("DOCKER_USER", "gurkenkoenig")
 tag := env_var_or_default("TAG", "latest")
 
-# Login to Docker Hub
-docker-login:
-    docker login
-
-# Build and push all images to Docker Hub
-push: backend-build frontend-build
-    docker tag nye-countdown-backend {{docker_user}}/nye-countdown-backend:{{tag}}
-    docker tag nye-countdown-frontend {{docker_user}}/nye-countdown-frontend:{{tag}}
-    docker push {{docker_user}}/nye-countdown-backend:{{tag}}
-    docker push {{docker_user}}/nye-countdown-frontend:{{tag}}
-    @echo "✅ Pushed images to {{docker_user}}/nye-countdown-*:{{tag}}"
+# Build and push all images to Docker Hub (multi-platform for AMD64 servers)
+push:
+    docker buildx build --platform linux/amd64 -t {{docker_user}}/nye-countdown-backend:{{tag}} --push ./backend
+    docker buildx build --platform linux/amd64 -t {{docker_user}}/nye-countdown-frontend:{{tag}} --push ./frontend
+    @echo "✅ Pushed AMD64 images to {{docker_user}}/nye-countdown-*:{{tag}}"
 
 # Push with specific tag: just push-tag v1.0.0
 push-tag version:
     TAG={{version}} just push
+
+
+# Deploy to production server
+deploy:
+    sh ./deploy.sh
 
 # ============================================
 # Full Stack Dev (run both in parallel)
