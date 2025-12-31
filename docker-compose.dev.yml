@@ -12,4 +12,3 @@ services:
 
   # Frontend runs separately with ng serve for hot reload
   # Run: cd frontend && npm start
-
