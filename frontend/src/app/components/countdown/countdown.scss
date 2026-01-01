@@ -347,6 +347,97 @@
   }
 }
 
+// Final Countdown Mode (last 60 seconds - seconds only)
+.final-countdown {
+  text-align: center;
+  animation: finalCountdownEntry 0.5s ease-out forwards;
+
+  // Last 10 seconds - dramatic mode
+  &.last-ten {
+    .seconds-only {
+      font-size: clamp(16rem, 45vw, 35rem);
+      animation: lastTenPulse 1s ease-in-out infinite, rainbowFlow 0.5s ease infinite;
+      filter: drop-shadow(0 0 40px rgba(255, 45, 149, 0.7))
+        drop-shadow(0 0 80px rgba(0, 245, 255, 0.5))
+        drop-shadow(0 0 120px rgba(255, 255, 0, 0.3));
+    }
+
+    .seconds-label {
+      animation: lastTenLabelPulse 0.5s ease-in-out infinite;
+      color: var(--neon-pink);
+      text-shadow: 0 0 20px var(--neon-pink), 0 0 40px var(--neon-pink);
+    }
+  }
+}
+
+@keyframes finalCountdownEntry {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes lastTenPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes lastTenLabelPulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
+.seconds-only {
+  font-family: 'Bungee Shade', cursive;
+  font-size: clamp(12rem, 35vw, 28rem);
+  background: linear-gradient(
+    45deg,
+    var(--neon-pink),
+    var(--neon-yellow),
+    var(--neon-green),
+    var(--neon-cyan),
+    var(--neon-purple),
+    var(--neon-pink)
+  );
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientFlow 2s ease infinite;
+  line-height: 0.9;
+  filter: drop-shadow(0 0 20px rgba(255, 45, 149, 0.4))
+    drop-shadow(0 0 40px rgba(0, 245, 255, 0.3));
+  will-change: transform;
+  transition: font-size 0.3s ease, filter 0.3s ease;
+}
+
+.seconds-label {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(1.5rem, 4vw, 3rem);
+  color: var(--neon-cyan);
+  text-shadow: 0 0 15px var(--neon-cyan), 0 0 30px var(--neon-cyan);
+  letter-spacing: 0.5em;
+  margin-top: 1rem;
+  animation: pulse 1.5s ease-in-out infinite;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
 // Sync status
 .sync-status {
   margin-top: 2rem;
