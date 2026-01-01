@@ -43,6 +43,10 @@ export class CountdownComponent implements OnInit, OnDestroy, AfterViewInit {
 
   // State signals
   readonly is_celebrating = signal(false);
+  readonly is_simulating = signal(false);
+  private simulation_start_ts = 0;
+  private readonly SIMULATION_DURATION_MS = 65000; // 65 seconds
+
   readonly time_remaining = signal<TimeRemaining>({
     days: 0,
     hours: 0,
@@ -121,12 +125,27 @@ export class CountdownComponent implements OnInit, OnDestroy, AfterViewInit {
   private update_countdown(): void {
     if (this.is_celebrating()) return;
 
-    const now_ms = this.time_sync.get_synced_time_ms();
-    const diff = TARGET_TS - now_ms;
+    let diff: number;
 
-    if (diff <= 0) {
-      this.start_celebration();
-      return;
+    if (this.is_simulating()) {
+      // Simulation mode: countdown from 65 seconds
+      const elapsed = Date.now() - this.simulation_start_ts;
+      diff = this.SIMULATION_DURATION_MS - elapsed;
+
+      if (diff <= 0) {
+        this.is_simulating.set(false);
+        this.start_celebration();
+        return;
+      }
+    } else {
+      // Normal mode: countdown to target
+      const now_ms = this.time_sync.get_synced_time_ms();
+      diff = TARGET_TS - now_ms;
+
+      if (diff <= 0) {
+        this.start_celebration();
+        return;
+      }
     }
 
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -153,9 +172,11 @@ export class CountdownComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   simulate_nye(): void {
-    if (!this.is_celebrating()) {
-      this.start_celebration();
-    }
+    if (this.is_celebrating() || this.is_simulating()) return;
+
+    // Start simulation at 65 seconds
+    this.is_simulating.set(true);
+    this.simulation_start_ts = Date.now();
   }
 
   toggle_fullscreen(): void {
