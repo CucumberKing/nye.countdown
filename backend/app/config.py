@@ -20,6 +20,13 @@ class Settings(BaseSettings):
     # Environment
     environment: str = "development"
 
+    # Target NYE timestamp (Unix seconds, defaults to Jan 1, 2027 00:00 UTC)
+    target_ts: float = 1798761600.0
+
+    # Optional legal links (external URLs, not in git)
+    impressum_url: str | None = None
+    privacy_url: str | None = None
+
     class Config:
         env_prefix = "NYE_"
 

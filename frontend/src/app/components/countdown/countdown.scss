@@ -636,10 +636,17 @@
   }
 }
 
-.simulate-btn {
+.bottom-links {
   position: fixed;
   bottom: 20px;
   left: 20px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  z-index: 1000;
+}
+
+.simulate-btn {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.3);
@@ -648,7 +655,6 @@
   cursor: pointer;
   font-family: 'Orbitron', sans-serif;
   font-size: 0.7rem;
-  z-index: 1000;
   transition: all 0.3s ease;
   opacity: 0.5;
 
@@ -657,6 +663,23 @@
     background: rgba(255, 45, 149, 0.2);
     border-color: var(--neon-pink);
     color: var(--neon-pink);
+  }
+}
+
+.legal-link {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.25);
+  padding: 6px 10px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.65rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  opacity: 0.6;
+
+  &:hover {
+    opacity: 1;
+    color: rgba(255, 255, 255, 0.6);
   }
 }
 

@@ -89,6 +89,16 @@ async def get_time():
     }
 
 
+@app.get("/api/config")
+async def get_config():
+    """Get static app configuration."""
+    return {
+        "target_ts": settings.target_ts,
+        "impressum_url": settings.impressum_url,
+        "privacy_url": settings.privacy_url,
+    }
+
+
 @app.websocket("/ws/time")
 async def websocket_time(websocket: WebSocket):
     """WebSocket endpoint for time synchronization using ping/pong protocol.
