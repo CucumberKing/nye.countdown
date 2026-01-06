@@ -1,12 +1,21 @@
 #!/bin/bash
 set -e
 
-# Configuration
-SERVER="165.232.120.130"
-USER="root"
+# Configuration - set these environment variables before running:
+#   NYE_SERVER - IP or hostname of your deployment server (required)
+#   NYE_USER   - SSH user (default: root)
+#   SSH_KEY    - Path to SSH key (default: ~/.ssh/id_rsa)
+SERVER="${NYE_SERVER:-}"
+USER="${NYE_USER:-root}"
 SSH_KEY="${SSH_KEY:-~/.ssh/id_rsa}"
 REMOTE_DIR="/opt/nye-countdown"
 SSH_OPTS="-i ${SSH_KEY} -o StrictHostKeyChecking=accept-new"
+
+if [ -z "$SERVER" ]; then
+    echo "❌ Error: NYE_SERVER environment variable is not set"
+    echo "   Usage: NYE_SERVER=your.server.ip ./deploy.sh"
+    exit 1
+fi
 
 echo "🚀 NYE Countdown Deploy"
 echo "   Server: ${USER}@${SERVER}"
