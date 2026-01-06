@@ -11,9 +11,7 @@ import {
   AfterViewInit,
 } from '@angular/core';
 import { TimeSyncService } from '../../services/time-sync.service';
-
-// Target: January 1, 2026 00:00:00 local time
-const TARGET_TS = new Date('January 1, 2026 00:00:00').getTime();
+import { ConfigService } from '../../services/config.service';
 
 interface TimeRemaining {
   days: number;
@@ -32,6 +30,7 @@ interface TimeRemaining {
 })
 export class CountdownComponent implements OnInit, OnDestroy, AfterViewInit {
   private readonly time_sync = inject(TimeSyncService);
+  private readonly config = inject(ConfigService);
   private interval_id: ReturnType<typeof setInterval> | null = null;
   private confetti_interval: ReturnType<typeof setInterval> | null = null;
   private firework_interval: ReturnType<typeof setInterval> | null = null;
@@ -71,6 +70,11 @@ export class CountdownComponent implements OnInit, OnDestroy, AfterViewInit {
 
   readonly is_final_minute = computed(() => this.time_remaining().total_ms < 60000);
   readonly is_last_ten = computed(() => this.time_remaining().total_ms < 10000);
+
+  // Config from backend
+  readonly target_year = this.config.target_year;
+  readonly impressum_url = this.config.impressum_url;
+  readonly privacy_url = this.config.privacy_url;
 
   readonly sync_status = this.time_sync.sync_status;
 
@@ -140,7 +144,8 @@ export class CountdownComponent implements OnInit, OnDestroy, AfterViewInit {
     } else {
       // Normal mode: countdown to target
       const now_ms = this.time_sync.get_synced_time_ms();
-      diff = TARGET_TS - now_ms;
+      const target_ts_ms = this.config.target_ts_ms();
+      diff = target_ts_ms - now_ms;
 
       if (diff <= 0) {
         this.start_celebration();

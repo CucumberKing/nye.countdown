@@ -37,7 +37,7 @@
         </div>
       </div>
 
-      <p class="subtitle">✨ Until 2026 ✨</p>
+      <p class="subtitle">✨ Until {{ target_year() }} ✨</p>
     }
 
     <!-- Final minute mode (only seconds, big display) -->
@@ -69,13 +69,21 @@
     </div>
   </div>
 
-  <button class="simulate-btn" (click)="simulate_nye()">simulate nye</button>
+  <div class="bottom-links">
+    <button class="simulate-btn" (click)="simulate_nye()">simulate nye</button>
+    @if (impressum_url()) {
+      <a class="legal-link" [href]="impressum_url()" target="_blank" rel="noopener">Impressum</a>
+    }
+    @if (privacy_url()) {
+      <a class="legal-link" [href]="privacy_url()" target="_blank" rel="noopener">Datenschutz</a>
+    }
+  </div>
 }
 
 <!-- Celebration View -->
 @if (is_celebrating()) {
   <div class="celebration" (click)="on_click($event)">
-    <div class="year-display">2026</div>
+    <div class="year-display">{{ target_year() }}</div>
     <div class="happy-new-year">🎉 HAPPY NEW YEAR! 🎉</div>
   </div>
 }
