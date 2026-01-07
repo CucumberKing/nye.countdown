@@ -1,9 +1,31 @@
 <div class="remote-container">
-  <!-- Header with mini countdown -->
+  <!-- Header with mini countdown (matching main view style) -->
   <header class="header">
-    <div class="mini-countdown" [class.celebrating]="is_celebrating()">
-      {{ countdown_display() }}
-    </div>
+    @if (!is_celebrating()) {
+      <div class="countdown-grid">
+        <div class="time-block">
+          <div class="time-value">{{ days_display() }}</div>
+          <div class="time-label">Days</div>
+        </div>
+        <div class="separator">:</div>
+        <div class="time-block">
+          <div class="time-value">{{ hours_display() }}</div>
+          <div class="time-label">Hours</div>
+        </div>
+        <div class="separator">:</div>
+        <div class="time-block">
+          <div class="time-value">{{ minutes_display() }}</div>
+          <div class="time-label">Min</div>
+        </div>
+        <div class="separator">:</div>
+        <div class="time-block">
+          <div class="time-value">{{ seconds_display() }}</div>
+          <div class="time-label">Sec</div>
+        </div>
+      </div>
+    } @else {
+      <div class="celebrating-text">🎉 HAPPY NEW YEAR! 🎉</div>
+    }
     <div class="connection-status" [attr.data-status]="sync_status()">
       @switch (sync_status()) {
         @case ('synced') {
