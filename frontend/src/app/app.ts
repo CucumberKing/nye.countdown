@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
-import { CountdownComponent } from './components/countdown/countdown';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  imports: [CountdownComponent],
-  template: '<app-countdown />',
+  imports: [RouterOutlet],
+  template: '<router-outlet />',
   styles: `
     :host {
       display: block;

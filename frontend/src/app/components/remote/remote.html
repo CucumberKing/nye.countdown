@@ -1,0 +1,90 @@
+<div class="remote-container">
+  <!-- Header with mini countdown -->
+  <header class="header">
+    <div class="mini-countdown" [class.celebrating]="is_celebrating()">
+      {{ countdown_display() }}
+    </div>
+    <div class="connection-status" [attr.data-status]="sync_status()">
+      @switch (sync_status()) {
+        @case ('synced') {
+          <span class="status-dot synced"></span> Synced
+        }
+        @case ('connected') {
+          <span class="status-dot connected"></span> Connected
+        }
+        @case ('cached') {
+          <span class="status-dot cached"></span> Cached
+        }
+        @default {
+          <span class="status-dot offline"></span> Offline
+        }
+      }
+    </div>
+  </header>
+
+  <!-- Emoji Grid -->
+  <section class="emoji-section">
+    <h2 class="section-title">Send Reactions</h2>
+    <div class="emoji-grid">
+      @for (emoji of emojis; track emoji) {
+        <button
+          class="emoji-btn"
+          [class.sent]="last_sent_emoji() === emoji"
+          [disabled]="!is_connected() || reaction_service.is_sending()"
+          (click)="send_emoji(emoji)"
+        >
+          {{ emoji }}
+        </button>
+      }
+    </div>
+  </section>
+
+  <!-- Greeting Section -->
+  <section class="greeting-section">
+    <h2 class="section-title">Send Greeting</h2>
+
+    <!-- Template selector -->
+    <div class="template-selector">
+      <button class="template-btn" (click)="cycle_template()">
+        <span class="template-preview">{{ greeting_templates[selected_template()] }}</span>
+        <span class="template-hint">Tap to change</span>
+      </button>
+    </div>
+
+    <!-- Send button -->
+    <button
+      class="greeting-btn"
+      [disabled]="
+        !is_connected() ||
+        greeting_service.is_sending() ||
+        greeting_service.is_locating() ||
+        !greeting_service.is_geolocation_available
+      "
+      (click)="send_greeting()"
+    >
+      @if (greeting_service.is_locating()) {
+        <span class="btn-icon">📍</span> Getting location...
+      } @else if (greeting_service.is_sending()) {
+        <span class="btn-icon">✨</span> Sending...
+      } @else if (greeting_service.last_location()) {
+        <span class="btn-icon">🌍</span> Send from {{ greeting_service.last_location() }}
+      } @else {
+        <span class="btn-icon">🌍</span> Share Your Location
+      }
+    </button>
+
+    @if (greeting_service.geolocation_error()) {
+      <div class="error-message">
+        {{ greeting_service.geolocation_error() }}
+      </div>
+    }
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p class="footer-text">
+      🎆 Countdown to {{ target_year() }} 🎆
+    </p>
+  </footer>
+</div>
+

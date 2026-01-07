@@ -1,52 +1,47 @@
-import { Injectable, signal, computed, OnDestroy } from '@angular/core';
-import { environment } from '../../environments/environment';
+import { Injectable, signal, computed, OnDestroy, inject, effect } from '@angular/core';
+import { WebSocketService } from './websocket.service';
 
 /**
  * Time Synchronization Service
  *
  * Maintains accurate time by syncing with the backend NTP server via WebSocket.
- * Uses ping/pong protocol for accurate round-trip timing.
+ * Uses JSON-RPC time.ping method for accurate round-trip timing.
  *
  * Features:
- * - WebSocket connection with auto-reconnect
+ * - Uses shared WebSocket connection via WebSocketService
  * - Proper per-message offset calculation with RTT
  * - localStorage persistence for resilience
  * - Graceful fallback to device time
  */
 
-interface PongMessage {
-  type: 'pong';
+interface TimePongResult {
   client_time_ms: number;
   server_time_ms: number;
   ntp_synced: boolean;
 }
 
 const STORAGE_KEY = 'nye_time_offset';
-const RECONNECT_DELAY_MS = 5000;
 const PING_INTERVAL_MS = 1000;
 
 @Injectable({
   providedIn: 'root',
 })
 export class TimeSyncService implements OnDestroy {
-  private ws: WebSocket | null = null;
-  private reconnect_timeout: ReturnType<typeof setTimeout> | null = null;
+  private readonly ws = inject(WebSocketService);
   private ping_interval: ReturnType<typeof setInterval> | null = null;
 
   // Signals for reactive state
   private readonly _offset_ms = signal<number>(this.load_stored_offset());
-  private readonly _is_connected = signal<boolean>(false);
   private readonly _is_ntp_synced = signal<boolean>(false);
 
   // Public readonly signals
   readonly offset_ms = this._offset_ms.asReadonly();
-  readonly is_connected = this._is_connected.asReadonly();
   readonly is_ntp_synced = this._is_ntp_synced.asReadonly();
 
   readonly sync_status = computed(() => {
-    if (this._is_connected() && this._is_ntp_synced()) {
+    if (this.ws.is_connected() && this._is_ntp_synced()) {
       return 'synced';
-    } else if (this._is_connected()) {
+    } else if (this.ws.is_connected()) {
       return 'connected';
     } else if (this._offset_ms() !== 0) {
       return 'cached';
@@ -55,11 +50,18 @@ export class TimeSyncService implements OnDestroy {
   });
 
   constructor() {
-    this.connect();
+    // Start ping loop when connected
+    effect(() => {
+      if (this.ws.is_connected()) {
+        this.start_ping_loop();
+      } else {
+        this.stop_ping_loop();
+      }
+    });
   }
 
   ngOnDestroy(): void {
-    this.disconnect();
+    this.stop_ping_loop();
   }
 
   /**
@@ -75,49 +77,6 @@ export class TimeSyncService implements OnDestroy {
    */
   get_synced_date(): Date {
     return new Date(this.get_synced_time_ms());
-  }
-
-  private connect(): void {
-    if (this.ws?.readyState === WebSocket.OPEN) {
-      return;
-    }
-
-    try {
-      this.ws = new WebSocket(environment.ws_url);
-
-      this.ws.onopen = () => {
-        console.log('✨ WebSocket connected to time server');
-        this._is_connected.set(true);
-        this.start_ping_loop();
-      };
-
-      this.ws.onmessage = (event) => {
-        const response_ts = Date.now();
-        try {
-          const message: PongMessage = JSON.parse(event.data);
-          if (message.type === 'pong') {
-            this.handle_pong_message(message, response_ts);
-          }
-        } catch (e) {
-          console.error('Failed to parse time message:', e);
-        }
-      };
-
-      this.ws.onclose = () => {
-        console.log('WebSocket disconnected');
-        this._is_connected.set(false);
-        this.stop_ping_loop();
-        this.schedule_reconnect();
-      };
-
-      this.ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
-        this._is_connected.set(false);
-      };
-    } catch (e) {
-      console.error('Failed to create WebSocket:', e);
-      this.schedule_reconnect();
-    }
   }
 
   private start_ping_loop(): void {
@@ -139,19 +98,31 @@ export class TimeSyncService implements OnDestroy {
     }
   }
 
-  private send_ping(): void {
-    if (this.ws?.readyState === WebSocket.OPEN) {
-      const ping_message = {
-        type: 'ping',
-        client_time_ms: Date.now(),
-      };
-      this.ws.send(JSON.stringify(ping_message));
+  private async send_ping(): Promise<void> {
+    if (!this.ws.is_connected()) {
+      return;
+    }
+
+    const request_ts = Date.now();
+
+    try {
+      const result = await this.ws.call<TimePongResult>('time.ping', {
+        client_time_ms: request_ts,
+      });
+
+      const response_ts = Date.now();
+      this.handle_pong_message(result, request_ts, response_ts);
+    } catch (e) {
+      // Ignore errors - connection might have dropped
     }
   }
 
-  private handle_pong_message(message: PongMessage, response_ts: number): void {
-    // Calculate round-trip time using the echoed client timestamp
-    const request_ts = message.client_time_ms;
+  private handle_pong_message(
+    message: TimePongResult,
+    request_ts: number,
+    response_ts: number
+  ): void {
+    // Calculate round-trip time
     const round_trip_ms = response_ts - request_ts;
     const estimated_latency_ms = round_trip_ms / 2;
 
@@ -166,31 +137,6 @@ export class TimeSyncService implements OnDestroy {
 
     // Persist to localStorage for resilience
     this.store_offset(offset);
-  }
-
-  private schedule_reconnect(): void {
-    if (this.reconnect_timeout) {
-      clearTimeout(this.reconnect_timeout);
-    }
-
-    this.reconnect_timeout = setTimeout(() => {
-      console.log('Attempting to reconnect...');
-      this.connect();
-    }, RECONNECT_DELAY_MS);
-  }
-
-  private disconnect(): void {
-    this.stop_ping_loop();
-
-    if (this.reconnect_timeout) {
-      clearTimeout(this.reconnect_timeout);
-      this.reconnect_timeout = null;
-    }
-
-    if (this.ws) {
-      this.ws.close();
-      this.ws = null;
-    }
   }
 
   private store_offset(offset: number): void {

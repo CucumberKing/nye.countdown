@@ -12,6 +12,8 @@ import {
 } from '@angular/core';
 import { TimeSyncService } from '../../services/time-sync.service';
 import { ConfigService } from '../../services/config.service';
+import { QrCodeComponent } from '../qr-code/qr-code';
+import { ReactionOverlayComponent } from '../reaction-overlay/reaction-overlay';
 
 interface TimeRemaining {
   days: number;
@@ -24,6 +26,7 @@ interface TimeRemaining {
 @Component({
   selector: 'app-countdown',
   standalone: true,
+  imports: [QrCodeComponent, ReactionOverlayComponent],
   templateUrl: './countdown.html',
   styleUrl: './countdown.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
