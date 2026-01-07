@@ -7,19 +7,23 @@ Provides:
 """
 
 import asyncio
-import json
 import logging
-import time
 from contextlib import asynccontextmanager
-from typing import Any
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.connection_manager import connection_manager
-from app.geolocation import geolocation_service
 from app.ntp_sync import ntp_service
+from app.models.reaction import ALLOWED_EMOJIS
+from app.models.greeting import GREETING_TEMPLATES
+
+# Import services to register RPC handlers
+from app.services import rpc_service  # noqa: F401
+from app.services import reaction_service  # noqa: F401
+from app.services import greeting_service  # noqa: F401
+from app.services import time_sync_service  # noqa: F401
 
 # Configure logging
 logging.basicConfig(
@@ -27,18 +31,6 @@ logging.basicConfig(
     format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
 )
 logger = logging.getLogger(__name__)
-
-# Allowed emojis for reactions (party emojis only)
-ALLOWED_EMOJIS = frozenset(
-    ["🎉", "🎊", "🥳", "🍾", "🥂", "✨", "🎆", "🎇", "💃", "🕺", "🪩", "❤️"]
-)
-
-# Greeting templates
-GREETING_TEMPLATES = [
-    "Happy New Year from {location}!",
-    "Cheers from {location}!",
-    "{location} says Happy New Year!",
-]
 
 
 @asynccontextmanager
@@ -84,155 +76,9 @@ app.add_middleware(
 )
 
 
-def make_rpc_response(
-    id: int | str | None, result: Any = None, error: dict | None = None
-) -> dict:
-    """Create a JSON-RPC 2.0 response."""
-    response: dict[str, Any] = {"jsonrpc": "2.0"}
-    if id is not None:
-        response["id"] = id
-    if error:
-        response["error"] = error
-    else:
-        response["result"] = result
-    return response
-
-
-def make_rpc_notification(method: str, params: dict) -> dict:
-    """Create a JSON-RPC 2.0 notification (no id, no response expected)."""
-    return {"jsonrpc": "2.0", "method": method, "params": params}
-
-
-async def handle_time_ping(
-    params: dict, request_id: int | str | None
-) -> dict:
-    """Handle time.ping request - return server time for sync."""
-    client_time_ms = params.get("client_time_ms")
-    return make_rpc_response(
-        request_id,
-        {
-            "client_time_ms": client_time_ms,
-            "server_time_ms": ntp_service.get_synced_time_ms(),
-            "ntp_synced": ntp_service.is_synced,
-        },
-    )
-
-
-async def handle_reaction_send(
-    params: dict, request_id: int | str | None, client_id: int
-) -> dict:
-    """Handle reaction.send - broadcast emoji to all clients."""
-    emoji = params.get("emoji", "")
-
-    if emoji not in ALLOWED_EMOJIS:
-        return make_rpc_response(
-            request_id,
-            error={
-                "code": -32602,
-                "message": "Invalid emoji",
-            },
-        )
-
-    # Get client location if available
-    client = connection_manager.get_client(client_id)
-    location = client.location if client else None
-
-    # Broadcast to all clients
-    broadcast_msg = make_rpc_notification(
-        "reaction.broadcast",
-        {
-            "emoji": emoji,
-            "from_location": location,
-            "ts": int(time.time() * 1000),
-        },
-    )
-    await connection_manager.broadcast(broadcast_msg)
-
-    return make_rpc_response(request_id, {"success": True})
-
-
-async def handle_greeting_send(
-    params: dict, request_id: int | str | None, client_id: int
-) -> dict:
-    """Handle greeting.send - resolve location and broadcast greeting."""
-    lat = params.get("lat")
-    lon = params.get("lon")
-    template_index = params.get("template", 0)
-
-    if lat is None or lon is None:
-        return make_rpc_response(
-            request_id,
-            error={
-                "code": -32602,
-                "message": "Missing lat/lon coordinates",
-            },
-        )
-
-    # Resolve location
-    location_result = await geolocation_service.reverse_geocode(lat, lon)
-    if location_result:
-        city, country = location_result
-        location = geolocation_service.format_location(city, country)
-    else:
-        location = "somewhere on Earth"
-
-    # Update client location
-    await connection_manager.update_client_location(client_id, location)
-
-    # Select template
-    template_idx = min(
-        max(0, int(template_index)), len(GREETING_TEMPLATES) - 1
-    )
-    greeting_text = GREETING_TEMPLATES[template_idx].format(location=location)
-
-    # Broadcast to all clients
-    broadcast_msg = make_rpc_notification(
-        "greeting.broadcast",
-        {
-            "text": greeting_text,
-            "location": location,
-            "ts": int(time.time() * 1000),
-        },
-    )
-    await connection_manager.broadcast(broadcast_msg)
-
-    return make_rpc_response(
-        request_id, {"success": True, "location": location}
-    )
-
-
-async def handle_rpc_message(
-    message: dict, client_id: int
-) -> dict | None:
-    """Route JSON-RPC message to appropriate handler."""
-    method = message.get("method", "")
-    params = message.get("params", {})
-    request_id = message.get("id")
-
-    handlers = {
-        "time.ping": lambda: handle_time_ping(params, request_id),
-        "reaction.send": lambda: handle_reaction_send(
-            params, request_id, client_id
-        ),
-        "greeting.send": lambda: handle_greeting_send(
-            params, request_id, client_id
-        ),
-    }
-
-    handler = handlers.get(method)
-    if handler:
-        return await handler()
-    else:
-        # Unknown method
-        if request_id is not None:
-            return make_rpc_response(
-                request_id,
-                error={
-                    "code": -32601,
-                    "message": f"Method not found: {method}",
-                },
-            )
-        return None
+# =============================================================================
+# REST Endpoints
+# =============================================================================
 
 
 @app.get("/health")
@@ -269,6 +115,11 @@ async def get_config():
     }
 
 
+# =============================================================================
+# WebSocket Endpoints
+# =============================================================================
+
+
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     """Unified WebSocket endpoint with JSON-RPC protocol.
@@ -288,22 +139,9 @@ async def websocket_endpoint(websocket: WebSocket):
     try:
         while True:
             data = await websocket.receive_text()
-
-            try:
-                message = json.loads(data)
-            except json.JSONDecodeError:
-                # Send parse error
-                error_response = make_rpc_response(
-                    None,
-                    error={"code": -32700, "message": "Parse error"},
-                )
-                await websocket.send_json(error_response)
-                continue
-
-            # Handle the RPC message
-            response = await handle_rpc_message(message, client_id)
+            response = await rpc_service.handle_message(data, client_id)
             if response:
-                await websocket.send_json(response)
+                await websocket.send_json(response.model_dump())
 
     except WebSocketDisconnect:
         logger.info("Client %s disconnected", client_id)
@@ -313,37 +151,9 @@ async def websocket_endpoint(websocket: WebSocket):
         await connection_manager.disconnect(client_id)
 
 
-# Keep the old endpoint for backwards compatibility during migration
-@app.websocket("/ws/time")
-async def websocket_time_legacy(websocket: WebSocket):
-    """Legacy WebSocket endpoint for time sync only.
-
-    DEPRECATED: Use /ws with JSON-RPC protocol instead.
-    """
-    await websocket.accept()
-    client_id = id(websocket)
-    logger.info("Legacy WebSocket client %s connected", client_id)
-
-    try:
-        while True:
-            data = await websocket.receive_text()
-            message = json.loads(data)
-
-            if message.get("type") == "ping":
-                response = {
-                    "type": "pong",
-                    "client_time_ms": message.get("client_time_ms"),
-                    "server_time_ms": ntp_service.get_synced_time_ms(),
-                    "ntp_synced": ntp_service.is_synced,
-                }
-                await websocket.send_json(response)
-
-    except WebSocketDisconnect:
-        logger.info("Legacy WebSocket client %s disconnected", client_id)
-    except Exception as e:
-        logger.exception(
-            "Legacy WebSocket error for client %s: %s", client_id, e
-        )
+# =============================================================================
+# Entry Point
+# =============================================================================
 
 
 if __name__ == "__main__":

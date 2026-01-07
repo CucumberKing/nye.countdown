@@ -1,6 +1,5 @@
 """Tests for the time sync functionality."""
 
-import json
 import time
 
 import pytest
@@ -23,6 +22,7 @@ class TestHealthEndpoint:
         assert data["status"] == "healthy"
         assert "ntp_synced" in data
         assert "ntp_offset_ms" in data
+        assert "connected_clients" in data
 
 
 class TestTimeEndpoint:
@@ -41,6 +41,23 @@ class TestTimeEndpoint:
         # Timestamp should be reasonable (within last minute of current time)
         now_ms = int(time.time() * 1000)
         assert abs(data["server_time_ms"] - now_ms) < 60000  # Within 60 seconds
+
+
+class TestConfigEndpoint:
+    """Tests for the config API endpoint."""
+
+    def test_get_config_returns_settings(self):
+        """Config endpoint should return app configuration."""
+        client = TestClient(app)
+        response = client.get("/api/config")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert "target_ts" in data
+        assert "allowed_emojis" in data
+        assert "greeting_templates" in data
+        assert isinstance(data["allowed_emojis"], list)
+        assert len(data["allowed_emojis"]) > 0
 
 
 class TestNTPSyncService:
@@ -87,61 +104,3 @@ class TestNTPSync:
         assert service.is_synced is True
         # Offset should be reasonable (within 10 seconds of local time)
         assert abs(service.offset) < 10.0
-
-
-class TestWebSocket:
-    """Tests for the WebSocket time endpoint."""
-
-    def test_websocket_ping_pong_returns_time(self):
-        """WebSocket should respond to ping with pong containing server time."""
-        client = TestClient(app)
-
-        with client.websocket_connect("/ws/time") as websocket:
-            # Send a ping message
-            client_time_ms = int(time.time() * 1000)
-            ping_message = {"type": "ping", "client_time_ms": client_time_ms}
-            websocket.send_text(json.dumps(ping_message))
-
-            # Should receive a pong response
-            data = websocket.receive_json()
-
-            assert data["type"] == "pong"
-            assert data["client_time_ms"] == client_time_ms
-            assert "server_time_ms" in data
-            assert "ntp_synced" in data
-
-            # Server timestamp should be reasonable
-            now_ms = int(time.time() * 1000)
-            assert abs(data["server_time_ms"] - now_ms) < 60000
-
-    def test_websocket_echoes_client_timestamp(self):
-        """WebSocket should echo back the exact client timestamp for RTT calculation."""
-        client = TestClient(app)
-
-        with client.websocket_connect("/ws/time") as websocket:
-            # Send multiple pings with different timestamps
-            for i in range(3):
-                client_time_ms = 1234567890000 + i  # Arbitrary test timestamps
-                ping_message = {"type": "ping", "client_time_ms": client_time_ms}
-                websocket.send_text(json.dumps(ping_message))
-
-                data = websocket.receive_json()
-
-                # Client timestamp must be echoed exactly for proper RTT calculation
-                assert data["client_time_ms"] == client_time_ms
-
-    def test_websocket_multiple_connections(self):
-        """Multiple WebSocket connections should work independently."""
-        client = TestClient(app)
-
-        with client.websocket_connect("/ws/time") as ws1:
-            with client.websocket_connect("/ws/time") as ws2:
-                # Send to first socket
-                ws1.send_text(json.dumps({"type": "ping", "client_time_ms": 1000}))
-                data1 = ws1.receive_json()
-                assert data1["client_time_ms"] == 1000
-
-                # Send to second socket
-                ws2.send_text(json.dumps({"type": "ping", "client_time_ms": 2000}))
-                data2 = ws2.receive_json()
-                assert data2["client_time_ms"] == 2000
