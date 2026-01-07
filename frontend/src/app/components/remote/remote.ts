@@ -59,6 +59,7 @@ export class RemoteComponent implements OnInit, OnDestroy {
 
   readonly last_sent_emoji = signal<string | null>(null);
   readonly selected_template = signal<number>(0);
+  readonly show_broadcast_feedback = signal<boolean>(false);
 
   // Connection state
   readonly is_connected = this.ws.is_connected;
@@ -110,12 +111,17 @@ export class RemoteComponent implements OnInit, OnDestroy {
     const success = await this.reaction_service.send_reaction(emoji);
     if (success) {
       this.last_sent_emoji.set(emoji);
+      this.show_broadcast_feedback.set(true);
       // Clear feedback after animation
       setTimeout(() => {
         if (this.last_sent_emoji() === emoji) {
           this.last_sent_emoji.set(null);
         }
       }, 500);
+      // Hide broadcast feedback after a bit longer
+      setTimeout(() => {
+        this.show_broadcast_feedback.set(false);
+      }, 1500);
     }
   }
 
