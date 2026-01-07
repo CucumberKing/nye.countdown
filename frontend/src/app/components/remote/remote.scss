@@ -218,6 +218,48 @@
   }
 }
 
+// Broadcast hint/feedback
+.broadcast-hint {
+  text-align: center;
+  margin-top: 12px;
+  min-height: 24px;
+  transition: all 0.3s ease;
+
+  .hint-text {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.35);
+    letter-spacing: 0.05em;
+  }
+
+  .broadcast-text {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: var(--neon-green);
+    text-shadow: 0 0 15px var(--neon-green);
+    animation: broadcast-pulse 0.5s ease-out;
+  }
+
+  &.active {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes broadcast-pulse {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(5px);
+  }
+  50% {
+    transform: scale(1.1) translateY(-2px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
 // Greeting Section
 .greeting-section {
   flex: 1;

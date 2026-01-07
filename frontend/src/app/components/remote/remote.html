@@ -46,7 +46,7 @@
 
   <!-- Emoji Grid -->
   <section class="emoji-section">
-    <h2 class="section-title">Send Reactions</h2>
+    <h2 class="section-title">Send to the World 🌍</h2>
     <div class="emoji-grid">
       @for (emoji of emojis; track emoji) {
         <button
@@ -59,11 +59,18 @@
         </button>
       }
     </div>
+    <div class="broadcast-hint" [class.active]="show_broadcast_feedback()">
+      @if (show_broadcast_feedback()) {
+        <span class="broadcast-text">🌍 Broadcast!</span>
+      } @else {
+        <span class="hint-text">appears on all screens worldwide</span>
+      }
+    </div>
   </section>
 
   <!-- Greeting Section -->
   <section class="greeting-section">
-    <h2 class="section-title">Send Greeting</h2>
+    <h2 class="section-title">Share Your Greetings 💬</h2>
 
     <!-- Template selector -->
     <div class="template-selector">
