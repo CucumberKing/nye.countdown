@@ -6,6 +6,7 @@ services:
     environment:
       - NYE_ENVIRONMENT=production
       - NYE_TARGET_TS=1798761600
+      - NYE_FRONTEND_URL=https://nyecountdown.live
     expose:
       - "8000"
     healthcheck:
