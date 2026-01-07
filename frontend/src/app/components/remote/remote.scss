@@ -36,22 +36,62 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.mini-countdown {
+// Countdown grid (matching main countdown style)
+.countdown-grid {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.time-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 50px;
+}
+
+.time-value {
   font-family: 'Bungee Shade', 'Orbitron', sans-serif;
-  font-size: clamp(1.8rem, 8vw, 2.5rem);
+  font-size: clamp(1.6rem, 7vw, 2.2rem);
   background: linear-gradient(135deg, var(--neon-pink), var(--neon-cyan));
   background-size: 200% 200%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   animation: gradient-shift 3s ease infinite;
-  text-align: center;
-  filter: drop-shadow(0 0 10px rgba(255, 45, 149, 0.3));
+  filter: drop-shadow(0 0 8px rgba(255, 45, 149, 0.4));
+  line-height: 1.1;
+}
 
-  &.celebrating {
-    font-size: clamp(1.2rem, 5vw, 1.5rem);
-    animation: pulse 0.5s ease-in-out infinite;
-  }
+.time-label {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.6rem;
+  color: var(--neon-cyan);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.8;
+  margin-top: 2px;
+}
+
+.separator {
+  font-family: 'Bungee Shade', 'Orbitron', sans-serif;
+  font-size: clamp(1.4rem, 6vw, 1.8rem);
+  color: var(--neon-pink);
+  text-shadow: 0 0 10px var(--neon-pink);
+  animation: pulse 1s ease-in-out infinite;
+  margin-bottom: 18px; // Align with time values
+}
+
+.celebrating-text {
+  font-family: 'Rubik Glitch', 'Orbitron', sans-serif;
+  font-size: clamp(1.2rem, 5vw, 1.6rem);
+  background: linear-gradient(135deg, var(--neon-yellow), var(--neon-pink));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: pulse 0.5s ease-in-out infinite;
+  text-align: center;
 }
 
 @keyframes gradient-shift {

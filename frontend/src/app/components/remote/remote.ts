@@ -64,24 +64,19 @@ export class RemoteComponent implements OnInit, OnDestroy {
   readonly is_connected = this.ws.is_connected;
   readonly sync_status = this.time_sync.sync_status;
 
-  // Computed displays
-  readonly countdown_display = computed(() => {
-    const t = this.time_remaining();
-    if (t.total_ms <= 0) return '🎉 HAPPY NEW YEAR! 🎉';
-
-    const pad = (n: number) => String(n).padStart(2, '0');
-
-    if (t.days > 0) {
-      return `${t.days}d ${pad(t.hours)}:${pad(t.minutes)}:${pad(t.seconds)}`;
-    }
-    if (t.hours > 0) {
-      return `${pad(t.hours)}:${pad(t.minutes)}:${pad(t.seconds)}`;
-    }
-    if (t.minutes > 0) {
-      return `${pad(t.minutes)}:${pad(t.seconds)}`;
-    }
-    return `${t.seconds}`;
-  });
+  // Computed displays (matching main countdown style)
+  readonly days_display = computed(() =>
+    String(this.time_remaining().days).padStart(2, '0')
+  );
+  readonly hours_display = computed(() =>
+    String(this.time_remaining().hours).padStart(2, '0')
+  );
+  readonly minutes_display = computed(() =>
+    String(this.time_remaining().minutes).padStart(2, '0')
+  );
+  readonly seconds_display = computed(() =>
+    String(this.time_remaining().seconds).padStart(2, '0')
+  );
 
   readonly is_celebrating = computed(() => this.time_remaining().total_ms <= 0);
 
