@@ -162,6 +162,7 @@ version = "1.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "fastapi" },
+    { name = "httpx" },
     { name = "ntplib" },
     { name = "pydantic-settings" },
     { name = "uvicorn", extra = ["standard"] },
@@ -178,6 +179,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "fastapi", specifier = ">=0.115.0" },
+    { name = "httpx", specifier = ">=0.27.0" },
     { name = "httpx", marker = "extra == 'dev'", specifier = ">=0.27.0" },
     { name = "ntplib", specifier = ">=0.4.0" },
     { name = "pydantic-settings", specifier = ">=2.6.0" },
