@@ -60,16 +60,10 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS configuration
-allowed_origins = (
-    ["https://nyecountdown.live", "https://www.nyecountdown.live"]
-    if settings.environment == "production"
-    else ["*"]
-)
-
+# CORS configuration (derived from settings.frontend_url)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
+    allow_origins=settings.cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -112,6 +106,7 @@ async def get_config():
         "privacy_url": settings.privacy_url,
         "allowed_emojis": list(ALLOWED_EMOJIS),
         "greeting_templates": GREETING_TEMPLATES,
+        "frontend_url": settings.frontend_url,
     }
 
 

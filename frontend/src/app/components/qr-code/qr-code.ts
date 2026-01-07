@@ -1,7 +1,8 @@
 import {
   Component,
   Input,
-  signal,
+  inject,
+  computed,
   effect,
   ElementRef,
   ViewChild,
@@ -9,12 +10,13 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 import QRCode from 'qrcode';
-import { environment } from '../../../environments/environment';
+import { ConfigService } from '../../services/config.service';
 
 /**
  * QR Code Component
  *
  * Renders a QR code that links to the remote control view.
+ * Uses frontend_url from backend config (single source of truth).
  * Clickable on desktop to open the remote in a new tab.
  */
 @Component({
@@ -86,19 +88,33 @@ import { environment } from '../../../environments/environment';
   `,
 })
 export class QrCodeComponent implements AfterViewInit {
+  private readonly config = inject(ConfigService);
+
   @ViewChild('qr_canvas') canvas_ref!: ElementRef<HTMLCanvasElement>;
   @Input() route: string = '/remote';
 
-  readonly remote_url = signal<string>('');
   readonly tooltip = 'Click to open remote control';
 
+  // Compute remote URL from backend config
+  readonly remote_url = computed(() => {
+    const base = this.config.frontend_url();
+    return `${base}/#${this.route}`;
+  });
+
+  private qr_generated = false;
+
   constructor() {
-    // Generate the URL
-    const base = environment.base_url || window.location.origin;
-    this.remote_url.set(`${base}/#${this.route}`);
+    // Re-generate QR code when config loads
+    effect(() => {
+      const url = this.remote_url();
+      if (this.canvas_ref && url && this.config.is_loaded()) {
+        this.generate_qr_code();
+      }
+    });
   }
 
   ngAfterViewInit(): void {
+    // Generate initial QR code (with default URL if config not yet loaded)
     this.generate_qr_code();
   }
 
@@ -117,6 +133,7 @@ export class QrCodeComponent implements AfterViewInit {
         },
         errorCorrectionLevel: 'M',
       });
+      this.qr_generated = true;
     } catch (err) {
       console.error('Failed to generate QR code:', err);
     }
@@ -126,4 +143,3 @@ export class QrCodeComponent implements AfterViewInit {
     window.open(this.remote_url(), '_blank');
   }
 }
-

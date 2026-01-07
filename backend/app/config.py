@@ -1,8 +1,11 @@
-from pydantic_settings import BaseSettings
+from pydantic import computed_field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
+
+    model_config = SettingsConfigDict(env_prefix="NYE_")
 
     # NTP servers to query (comma-separated in env)
     ntp_servers: list[str] = [
@@ -27,8 +30,26 @@ class Settings(BaseSettings):
     impressum_url: str | None = None
     privacy_url: str | None = None
 
-    class Config:
-        env_prefix = "NYE_"
+    # Frontend URL for QR codes and CORS
+    # Default: localhost for development, set via NYE_FRONTEND_URL in production
+    frontend_url: str = "http://localhost:4200"
+
+    @computed_field
+    @property
+    def cors_origins(self) -> list[str]:
+        """Compute allowed CORS origins based on frontend_url."""
+        if self.environment == "production":
+            # In production, allow the configured frontend URL
+            # Also allow www. variant if applicable
+            origins = [self.frontend_url]
+            if self.frontend_url.startswith("https://") and "www." not in self.frontend_url:
+                # Add www variant
+                www_url = self.frontend_url.replace("https://", "https://www.")
+                origins.append(www_url)
+            return origins
+        else:
+            # Development: allow all origins
+            return ["*"]
 
 
 settings = Settings()
