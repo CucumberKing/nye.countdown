@@ -102,7 +102,7 @@ async def get_config():
     """Get static app configuration."""
     return {
         "target_ts": settings.target_ts,
-        "impressum_url": settings.impressum_url,
+        "imprint_url": settings.imprint_url,
         "privacy_url": settings.privacy_url,
         "allowed_emojis": list(ALLOWED_EMOJIS),
         "greeting_templates": GREETING_TEMPLATES,

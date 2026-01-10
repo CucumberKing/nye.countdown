@@ -7,6 +7,8 @@ services:
       - NYE_ENVIRONMENT=production
       - NYE_TARGET_TS=1798761600
       - NYE_FRONTEND_URL=https://nyecountdown.live
+      # - NYE_IMPRINT_URL=https://example.com/impressum
+      # - NYE_PRIVACY_URL=https://example.com/datenschutz
     expose:
       - "8000"
     healthcheck:

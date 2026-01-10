@@ -76,7 +76,7 @@ export class CountdownComponent implements OnInit, OnDestroy, AfterViewInit {
 
   // Config from backend
   readonly target_year = this.config.target_year;
-  readonly impressum_url = this.config.impressum_url;
+  readonly imprint_url = this.config.imprint_url;
   readonly privacy_url = this.config.privacy_url;
 
   readonly sync_status = this.time_sync.sync_status;

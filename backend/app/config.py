@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     target_ts: float = 1798761600.0
 
     # Optional legal links (external URLs, not in git)
-    impressum_url: str | None = None
+    imprint_url: str | None = None
     privacy_url: str | None = None
 
     # Frontend URL for QR codes and CORS
