@@ -1,3 +1,43 @@
+@font-face {
+  font-family: 'Bungee Shade';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/bungee-shade-400.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Orbitron';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/orbitron-400.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Orbitron';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/orbitron-700.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Orbitron';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url('/fonts/orbitron-900.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Rubik Glitch';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/rubik-glitch-400.ttf') format('truetype');
+}
+
 * {
   margin: 0;
   padding: 0;
