@@ -71,8 +71,8 @@
 
   <div class="bottom-links">
     <button class="simulate-btn" (click)="simulate_nye()">simulate nye</button>
-    @if (impressum_url()) {
-      <a class="legal-link" [href]="impressum_url()" target="_blank" rel="noopener">Impressum</a>
+    @if (imprint_url()) {
+      <a class="legal-link" [href]="imprint_url()" target="_blank" rel="noopener">Impressum</a>
     }
     @if (privacy_url()) {
       <a class="legal-link" [href]="privacy_url()" target="_blank" rel="noopener">Datenschutz</a>
