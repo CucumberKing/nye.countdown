@@ -9,7 +9,7 @@ nyecountdown.live {
     }
 
     # WebSocket endpoint
-    handle /ws/* {
+    handle /ws {
         reverse_proxy backend:8000
     }
 
