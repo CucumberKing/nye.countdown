@@ -683,6 +683,27 @@
   }
 }
 
+.github-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.25);
+  padding: 6px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  opacity: 0.6;
+
+  &:hover {
+    opacity: 1;
+    color: var(--neon-cyan);
+    filter: drop-shadow(0 0 8px var(--neon-cyan));
+  }
+
+  svg {
+    display: block;
+  }
+}
+
 // Reduced motion
 @media (prefers-reduced-motion: reduce) {
   *,

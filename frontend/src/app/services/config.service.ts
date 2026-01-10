@@ -12,6 +12,7 @@ interface AppConfig {
   target_ts: number; // Unix seconds
   imprint_url: string | null;
   privacy_url: string | null;
+  github_url: string | null;
   frontend_url: string;
 }
 
@@ -29,6 +30,7 @@ export class ConfigService {
   private readonly _target_ts_ms = signal<number>(DEFAULT_TARGET_TS_MS);
   private readonly _imprint_url = signal<string | null>(null);
   private readonly _privacy_url = signal<string | null>(null);
+  private readonly _github_url = signal<string | null>(null);
   private readonly _frontend_url = signal<string>(DEFAULT_FRONTEND_URL);
   private readonly _is_loaded = signal<boolean>(false);
 
@@ -36,6 +38,7 @@ export class ConfigService {
   readonly target_ts_ms = this._target_ts_ms.asReadonly();
   readonly imprint_url = this._imprint_url.asReadonly();
   readonly privacy_url = this._privacy_url.asReadonly();
+  readonly github_url = this._github_url.asReadonly();
   readonly frontend_url = this._frontend_url.asReadonly();
   readonly is_loaded = this._is_loaded.asReadonly();
 
@@ -61,6 +64,7 @@ export class ConfigService {
       this._target_ts_ms.set(config.target_ts * 1000);
       this._imprint_url.set(config.imprint_url);
       this._privacy_url.set(config.privacy_url);
+      this._github_url.set(config.github_url);
       this._frontend_url.set(config.frontend_url);
       this._is_loaded.set(true);
 

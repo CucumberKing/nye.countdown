@@ -104,6 +104,7 @@ async def get_config():
         "target_ts": settings.target_ts,
         "imprint_url": settings.imprint_url,
         "privacy_url": settings.privacy_url,
+        "github_url": settings.github_url,
         "allowed_emojis": list(ALLOWED_EMOJIS),
         "greeting_templates": GREETING_TEMPLATES,
         "frontend_url": settings.frontend_url,
