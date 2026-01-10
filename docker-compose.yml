@@ -9,6 +9,7 @@ services:
       - NYE_FRONTEND_URL=https://nyecountdown.live
       # - NYE_IMPRINT_URL=https://example.com/impressum
       # - NYE_PRIVACY_URL=https://example.com/datenschutz
+      # - NYE_GITHUB_URL=https://github.com/username/repo
     expose:
       - "8000"
     healthcheck:

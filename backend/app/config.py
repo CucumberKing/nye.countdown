@@ -5,7 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
-    model_config = SettingsConfigDict(env_prefix="NYE_")
+    model_config = SettingsConfigDict(env_prefix="NYE_", env_file=".env")
 
     # NTP servers to query (comma-separated in env)
     ntp_servers: list[str] = [
@@ -29,6 +29,7 @@ class Settings(BaseSettings):
     # Optional legal links (external URLs, not in git)
     imprint_url: str | None = None
     privacy_url: str | None = None
+    github_url: str | None = None
 
     # Frontend URL for QR codes and CORS
     # Default: localhost for development, set via NYE_FRONTEND_URL in production

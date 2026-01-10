@@ -5,12 +5,12 @@ set -e
 DOCKER_USER="${DOCKER_USER:-gurkenkoenig}"
 REPO_NAME="nye-countdown"
 TAG="${1:-latest}"
-PLATFORM="linux/amd64"
+PLATFORM="linux/amd64,linux/arm64"
 
-echo "🐳 Building and pushing NYE Countdown images..."
+echo "Building and pushing NYE Countdown images..."
 echo "   Docker Hub: ${DOCKER_USER}/${REPO_NAME}"
 echo "   Tag: ${TAG}"
-echo "   Platform: ${PLATFORM}"
+echo "   Platforms: ${PLATFORM}"
 echo ""
 
 # Login check
@@ -32,6 +32,6 @@ docker buildx build --platform "${PLATFORM}" \
     --push ./frontend
 
 echo ""
-echo "✅ Done! AMD64 images pushed:"
+echo "Done! Multi-arch images pushed (amd64 + arm64):"
 echo "   ${DOCKER_USER}/${REPO_NAME}-backend:${TAG}"
 echo "   ${DOCKER_USER}/${REPO_NAME}-frontend:${TAG}"
