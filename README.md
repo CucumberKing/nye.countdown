@@ -8,7 +8,7 @@ A sleek New Year's Eve countdown with NTP-synchronized time accuracy. Because be
 
 ## What's This?
 
-A real-time countdown to midnight that syncs with atomic clocks via NTP servers. The frontend calculates the exact offset between your device and the server, so everyone sees "0" at the same moment — no matter how wrong their system clock is.
+A real-time countdown to midnight that connects parties around the world. Display it on your TV, send emojis and greetings — and they appear on every screen watching. Everyone hits "0" at the exact same moment thanks to NTP sync with atomic clocks.
 
 ## Features
 
@@ -19,11 +19,11 @@ A real-time countdown to midnight that syncs with atomic clocks via NTP servers.
 - Fullscreen support
 - Simulation mode to test the celebration without waiting until December 31st
 
-### Interactive Reactions
+### Global Interactions
 - **Mobile Remote:** Scan QR code on the main display to open a mobile remote control
-- **Emoji Reactions:** Send emojis from your phone that appear on the main countdown display
-- **Greetings:** Broadcast custom greeting messages to the big screen
-- **Real-time sync:** All reactions are broadcast to all connected clients via WebSocket RPC
+- **Emoji Reactions:** Send emojis from your phone — they appear on every screen watching worldwide
+- **Greetings:** Broadcast messages to all connected parties around the globe
+- **Real-time sync:** All reactions are broadcast to all connected clients via WebSocket
 
 ### GPU-Accelerated Effects (PixiJS)
 - **Firework Effect** (🎆, 🎇): Rocket launches with particle trail, explodes into 80+ colorful particles with gravity
