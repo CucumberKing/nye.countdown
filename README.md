@@ -4,7 +4,7 @@ A sleek New Year's Eve countdown with NTP-synchronized time accuracy. Because be
 
 **Live Demo:** [nyecountdown.live](https://nyecountdown.live)
 
-![Screenshot](docs/screenshot.png)
+![Main Countdown Display](docs/screenshot_main.png)
 
 ## What's This?
 
@@ -19,8 +19,19 @@ A real-time countdown to midnight that connects parties around the world. Displa
 - Fullscreen support
 - Simulation mode to test the celebration without waiting until December 31st
 
+### Mobile Remote
+
+![Mobile Remote](docs/screenshot_mobile_remote.png)
+
+Scan the QR code on the main display to open the mobile remote on your phone. The remote lets you:
+
+- **Send Emoji Reactions:** Tap an emoji and it appears on every screen watching worldwide — connect your party with others around the globe
+- **Share Greetings:** Broadcast "Happy New Year" messages with your location to all connected parties
+- **See the Countdown:** A mini countdown keeps you synced while you interact
+
+The idea: NYE is about connection. Your emoji or greeting travels from your phone to TVs at parties in Berlin, Tokyo, New York — everywhere people are watching together.
+
 ### Global Interactions
-- **Mobile Remote:** Scan QR code on the main display to open a mobile remote control
 - **Emoji Reactions:** Send emojis from your phone — they appear on every screen watching worldwide
 - **Greetings:** Broadcast messages to all connected parties around the globe
 - **Real-time sync:** All reactions are broadcast to all connected clients via WebSocket
