@@ -20,9 +20,12 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  padding: 20px;
+  min-height: 100dvh; // Dynamic viewport height for mobile
+  padding: 16px;
+  padding-top: max(16px, env(safe-area-inset-top));
   max-width: 500px;
   margin: 0 auto;
+  overflow-y: auto;
 }
 
 // Header
@@ -30,9 +33,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 24px;
-  padding-bottom: 20px;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -151,24 +154,24 @@
 // Section titles
 .section-title {
   font-family: 'Orbitron', sans-serif;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   color: var(--neon-cyan);
   text-transform: uppercase;
   letter-spacing: 0.15em;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   text-align: center;
   text-shadow: 0 0 10px var(--neon-cyan);
 }
 
 // Emoji Grid
 .emoji-section {
-  margin-bottom: 32px;
+  margin-bottom: 20px;
 }
 
 .emoji-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+  gap: 10px;
 }
 
 .emoji-btn {
@@ -268,7 +271,7 @@
 }
 
 .template-selector {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .template-btn {
@@ -276,13 +279,13 @@
   background: var(--surface);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
-  padding: 16px;
+  padding: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
 
   &:hover {
     background: var(--surface-hover);
@@ -304,9 +307,9 @@
 
 .greeting-btn {
   width: 100%;
-  padding: 18px 24px;
+  padding: 14px 20px;
   font-family: 'Orbitron', sans-serif;
-  font-size: 1rem;
+  font-size: 0.9rem;
   background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
   border: none;
   border-radius: 16px;
@@ -353,14 +356,14 @@
 // Footer
 .footer {
   margin-top: auto;
-  padding-top: 24px;
+  padding-top: 16px;
   text-align: center;
 }
 
 .footer-text {
   font-family: 'Orbitron', sans-serif;
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.3);
 }
 
 // Safe area for mobile
@@ -370,7 +373,39 @@
   }
 }
 
-// Responsive
+// Responsive - small screens
+@media (max-height: 700px) {
+  .header {
+    gap: 4px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+  }
+
+  .emoji-section {
+    margin-bottom: 16px;
+  }
+
+  .emoji-grid {
+    gap: 8px;
+  }
+
+  .broadcast-hint {
+    margin-top: 8px;
+    min-height: 20px;
+  }
+
+  .footer {
+    padding-top: 12px;
+  }
+}
+
+// Very small screens - hide footer
+@media (max-height: 600px) {
+  .footer {
+    display: none;
+  }
+}
+
 @media (max-width: 360px) {
   .emoji-grid {
     grid-template-columns: repeat(3, 1fr);
