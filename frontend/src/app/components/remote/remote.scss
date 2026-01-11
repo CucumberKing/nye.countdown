@@ -366,6 +366,25 @@
   color: rgba(255, 255, 255, 0.3);
 }
 
+.legal-links {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.legal-link {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.4);
+  text-decoration: none;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: var(--neon-cyan);
+  }
+}
+
 // Safe area for mobile
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
   .remote-container {

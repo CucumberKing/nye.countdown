@@ -82,6 +82,8 @@ export class RemoteComponent implements OnInit, OnDestroy {
   readonly is_celebrating = computed(() => this.time_remaining().total_ms <= 0);
 
   readonly target_year = this.config.target_year;
+  readonly imprint_url = this.config.imprint_url;
+  readonly privacy_url = this.config.privacy_url;
 
   ngOnInit(): void {
     this.update_countdown();
