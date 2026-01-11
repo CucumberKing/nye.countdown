@@ -114,6 +114,14 @@
     <p class="footer-text">
       🎆 Countdown to {{ target_year() }} 🎆
     </p>
+    <div class="legal-links">
+      @if (imprint_url()) {
+        <a class="legal-link" [href]="imprint_url()" target="_blank" rel="noopener">Impressum</a>
+      }
+      @if (privacy_url()) {
+        <a class="legal-link" [href]="privacy_url()" target="_blank" rel="noopener">Datenschutz</a>
+      }
+    </div>
   </footer>
 </div>
 
