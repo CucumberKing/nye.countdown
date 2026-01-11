@@ -82,9 +82,10 @@ docker_user := env_var_or_default("DOCKER_USER", "gurkenkoenig")
 tag := env_var_or_default("TAG", "latest")
 
 # Build and push all images to Docker Hub (multi-platform for AMD64 servers)
+# Includes --provenance and --sbom for supply chain attestation
 push:
-    docker buildx build --platform linux/amd64 -t {{docker_user}}/nye-countdown-backend:{{tag}} --push ./backend
-    docker buildx build --platform linux/amd64 -t {{docker_user}}/nye-countdown-frontend:{{tag}} --push ./frontend
+    docker buildx build --platform linux/amd64 --provenance=true --sbom=true -t {{docker_user}}/nye-countdown-backend:{{tag}} --push ./backend
+    docker buildx build --platform linux/amd64 --provenance=true --sbom=true -t {{docker_user}}/nye-countdown-frontend:{{tag}} --push ./frontend
     @echo "✅ Pushed AMD64 images to {{docker_user}}/nye-countdown-*:{{tag}}"
 
 # Push with specific tag: just push-tag v1.0.0

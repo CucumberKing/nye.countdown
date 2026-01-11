@@ -3,10 +3,18 @@ FROM ghcr.io/astral-sh/uv:python3.14-bookworm-slim
 
 WORKDIR /app
 
+# Update system packages to fix vulnerabilities and create non-root user
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    groupadd --gid 1000 appgroup && \
+    useradd --uid 1000 --gid appgroup --shell /bin/bash --create-home appuser
+
 # Copy dependency files first (better caching)
 COPY pyproject.toml uv.lock ./
 
-# Install dependencies with caching
+# Install dependencies with caching (as root for package installation)
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --locked --no-install-project --no-editable
 
@@ -16,6 +24,12 @@ COPY app/ app/
 # Sync the project (installs the app itself)
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --locked --no-editable
+
+# Change ownership to non-root user
+RUN chown -R appuser:appgroup /app
+
+# Switch to non-root user
+USER appuser
 
 # Expose port
 EXPOSE 8000
