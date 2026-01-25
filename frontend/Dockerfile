@@ -18,6 +18,8 @@ RUN npm run build
 # Production stage - serve with nginx
 FROM nginx:alpine
 
+LABEL org.opencontainers.image.source="https://github.com/CucumberKing/nye.countdown"
+
 # Update system packages to fix vulnerabilities and create non-root user
 RUN apk update && \
     apk upgrade --no-cache && \

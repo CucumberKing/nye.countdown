@@ -33,6 +33,18 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+class HealthCheckFilter(logging.Filter):
+    """Filter to suppress health check endpoint logs."""
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        """Return False to suppress health check logs."""
+        return "/health" not in record.getMessage()
+
+
+# Apply filter to uvicorn access logger
+logging.getLogger("uvicorn.access").addFilter(HealthCheckFilter())
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan - start NTP sync on startup."""
