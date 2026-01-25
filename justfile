@@ -74,23 +74,40 @@ logs:
     docker compose logs -f
 
 # ============================================
-# Docker Hub
+# Docker: Build & Push (GHCR)
 # ============================================
 
-# Docker Hub username (override with: just push docker_user=otherusername)
-docker_user := env_var_or_default("DOCKER_USER", "gurkenkoenig")
-tag := env_var_or_default("TAG", "latest")
+# GitHub Container Registry
+REGISTRY := "ghcr.io/cucumberking/nye.countdown"
 
-# Build and push all images to Docker Hub (multi-platform for AMD64 servers)
-# Includes --provenance and --sbom for supply chain attestation
-push:
-    docker buildx build --platform linux/amd64 --provenance=true --sbom=true -t {{docker_user}}/nye-countdown-backend:{{tag}} --push ./backend
-    docker buildx build --platform linux/amd64 --provenance=true --sbom=true -t {{docker_user}}/nye-countdown-frontend:{{tag}} --push ./frontend
-    @echo "✅ Pushed AMD64 images to {{docker_user}}/nye-countdown-*:{{tag}}"
+# Build and push all containers
+build-docker: build-docker-backend build-docker-frontend
+    @echo "All images built and pushed successfully!"
 
-# Push with specific tag: just push-tag v1.0.0
-push-tag version:
-    TAG={{version}} just push
+# Build and push backend image
+build-docker-backend:
+    docker buildx build \
+        --platform linux/amd64 \
+        --tag {{REGISTRY}}-backend:latest \
+        --push \
+        ./backend
+
+# Build and push frontend image
+build-docker-frontend:
+    docker buildx build \
+        --platform linux/amd64 \
+        --tag {{REGISTRY}}-frontend:latest \
+        --push \
+        ./frontend
+
+# Setup buildx builder (run once)
+docker-setup-buildx:
+    docker buildx create --name multiarch --driver docker-container --use || docker buildx use multiarch
+    docker buildx inspect --bootstrap
+
+# Login to GHCR (uses gh CLI - no manual token needed!)
+docker-login:
+    gh auth token | docker login ghcr.io -u $(gh api user --jq .login) --password-stdin
 
 
 # Deploy to production server
