@@ -120,6 +120,8 @@ async def get_config():
         "allowed_emojis": list(ALLOWED_EMOJIS),
         "greeting_templates": GREETING_TEMPLATES,
         "frontend_url": settings.frontend_url,
+        "umami_website_id": settings.umami_website_id,
+        "umami_host_url": settings.umami_host_url,
     }
 
 

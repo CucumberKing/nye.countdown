@@ -35,6 +35,10 @@ class Settings(BaseSettings):
     # Default: localhost for development, set via NYE_FRONTEND_URL in production
     frontend_url: str = "http://localhost:4200"
 
+    # Analytics (optional - if not set, tracking is disabled)
+    umami_website_id: str | None = None
+    umami_host_url: str | None = None
+
     @computed_field
     @property
     def cors_origins(self) -> list[str]:
