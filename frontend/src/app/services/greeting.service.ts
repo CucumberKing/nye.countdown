@@ -1,6 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { Observable } from 'rxjs';
 import { WebSocketService } from './websocket.service';
+import { AnalyticsService } from './analytics.service';
 
 /**
  * Greeting Service
@@ -32,6 +33,7 @@ export const GREETING_TEMPLATES = [
 })
 export class GreetingService {
   private readonly ws = inject(WebSocketService);
+  private readonly analytics = inject(AnalyticsService);
 
   // Track last sent time to prevent spam
   private last_sent_ts = 0;
@@ -103,6 +105,7 @@ export class GreetingService {
 
       if (result.success) {
         this._last_location.set(result.location);
+        this.analytics.track_greeting(result.location);
         return true;
       }
 

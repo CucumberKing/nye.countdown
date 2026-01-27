@@ -1,6 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { Observable } from 'rxjs';
 import { WebSocketService } from './websocket.service';
+import { AnalyticsService } from './analytics.service';
 
 /**
  * Reaction Service
@@ -38,6 +39,7 @@ export type PartyEmoji = (typeof ALLOWED_EMOJIS)[number];
 })
 export class ReactionService {
   private readonly ws = inject(WebSocketService);
+  private readonly analytics = inject(AnalyticsService);
 
   // Track last sent time to prevent spam
   private last_sent_ts = 0;
@@ -79,6 +81,7 @@ export class ReactionService {
 
     try {
       await this.ws.call('reaction.send', { emoji });
+      this.analytics.track_reaction(emoji);
       return true;
     } catch (e) {
       console.error('Failed to send reaction:', e);
